@@ -1,0 +1,249 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1344\cocoasubrtf720
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
+
+\f0\fs24 \cf0 package programmeringsuppgift1;\
+\
+import java.nio.file.Files;\
+import java.nio.file.Paths;\
+import java.util.Random;\
+\
+/*\
+ * @author Linus Forsberg \
+ */\
+\
+public class Programmeringsuppgift1 \{\
+	\
+	//	Mergesort p\'e5 del av array fr\'e5n lo till hi:\
+	static void mergeSort(byte[] a, int lo, int hi) \{ \
+		\
+		if(lo < hi) \{ 						//Kolla om lo \'e4r mindre \'e4n hi, annars \'e4r arrayen sorterad \
+			int mid = lo + (hi-lo)/2;		//Annars forts\'e4tt med att s\'e4tta mid till det element som \'e4r i mitten av lo och hi\
+			mergeSort(a,lo,mid);			//K\'f6r mergesort rekursivt p\'e5 delen fr\'e5n lo till mid (v\'e4nstra sidan av arrayen)		\
+			mergeSort(a,mid+1,hi);			//K\'f6r mergesort rekursivt p\'e5 delen fr\'e5n mid + 1 till hi (h\'f6gra sidan av arrayen)\
+			merge(a,lo,mid,hi);				//Nu har vi tv\'e5 halvor som vardera \'e4r sorterade. K\'f6r merge p\'e5 dem.		\
+		\}\
+	\}\
+\
+	//	Merge p\'e5 delar av array (lo \'85 mid) och (mid + 1 \'85 hi):		\
+	public static void merge(byte[] a,int lo, int mid, int hi) \{\
+		byte[] copy = new byte[a.length];	\
+		for(int i = lo; i <= hi; i++) \{		//Kopiera \'f6ver allt \'96 fr\'e5n position lo till hi \'96 till extralagringsarray.\
+			copy[i] = a[i];\
+		\}\
+		int i = lo, j = mid+1, k = lo;		//L\'e5t i b\'f6rja p\'e5 lo (b\'f6rjan p\'e5 den v\'e4nstra delen) och j p\'e5 mid + 1 (b\'f6rjan p\'e5 den h\'f6gra).		\
+		while(i <= mid && j <= hi) \{		//Kopiera minsta v\'e4rdena fr\'e5n v\'e4nstra eller h\'f6gra sidan tillbaka till f\'f6rsta arrayen.\
+			if(copy[i] <= copy[j]) \{		//L\'e5t k g\'e5 igenom alla v\'e4rden fr\'e5n lo till hi, och utf\'f6r f\'f6ljande f\'f6r varje:\
+				a[k] = copy[i];				//Vi ska nu ta ett v\'e4rde fr\'e5n extraarrayen, antingen fr\'e5n position i (v\'e4nstra delen) \
+				i++;				\
+			\} else \{							\
+				a[k] = copy[j];				//eller fr\'e5n position j (h\'f6gra delen), och l\'e4gga p\'e5 position k i originalarrayen.		\
+				j++;						\
+			\}								\
+			k++;\
+		\}\
+		while(i <= mid) \{					//Om i \'e4r st\'f6rre \'e4n mid (allts\'e5 v\'e4nstra delen \'e4r slut), tar tar vi v\'e4rdet fr\'e5n position j (och r\'e4knar upp j).\
+			a[k] = copy[i];					//Om j \'e4r st\'f6rre \'e4n hi (allts\'e5 h\'f6gra delen \'e4r slut), tar tar vi v\'e4rdet fr\'e5n position i (och r\'e4knar upp i).\
+			k++;							//Annars j\'e4mf\'f6r vi v\'e4rdet p\'e5 position i med v\'e4rdet p\'e5 position j, och tar det minsta (och r\'e4knar upp antingen i eller j, det vi tog fr\'e5n).\
+			i++;\
+		\}\
+		\
+		\
+		\
+		//		if(i > mid) \{\
+		//			a[k] = copy[j++];\
+		//		\}\
+		//		else if(j > hi) \{\
+		//			a[k] = copy[i++];\
+		//		\}\
+		//		else if(copy[i] > copy[j]) \{\
+		//			a[k] = copy[j++];\
+		//		\}\
+		//		else\{\
+		//			a[k] = copy[i++];\
+		//		\}\
+	\}\
+	\
+	\
+	//		Uppgift 2b)\
+	\
+	static void arrayCreate(byte[] a, int lo, int hi) \{\
+		byte[] copy = new byte[a.length];\
+		mergeSort2(a, lo, hi , copy);\
+	\}\
+\
+	static void mergeSort2(byte[] a, int lo, int hi, byte[] copy) \{ \
+		\
+		if(lo < hi) \{ 						 \
+			int mid = lo + (hi-lo)/2;		\
+			mergeSort2(a,lo,mid,copy);				\
+			mergeSort2(a,mid+1,hi,copy);	\
+			merge2(a,lo,mid,hi,copy);		\
+		\}\
+	\}\
+\
+		\
+	public static void merge2(byte[] a,int lo, int mid, int hi, byte[] copy) \{ \
+\
+		for(int i = lo; i <= hi; i++) \{		\
+			copy[i] = a[i];\
+		\}\
+		int i = lo, j = mid+1, k = lo;		//L\'e5t i b\'f6rja p\'e5 lo (b\'f6rjan p\'e5 den v\'e4nstra delen) och j p\'e5 mid + 1 (b\'f6rjan p\'e5 den h\'f6gra).		\
+		while(i <= mid && j <= hi) \{		//Kopiera minsta v\'e4rdena fr\'e5n v\'e4nstra eller h\'f6gra sidan tillbaka till f\'f6rsta arrayen.\
+			if(copy[i] <= copy[j]) \{		//L\'e5t k g\'e5 igenom alla v\'e4rden fr\'e5n lo till hi, och utf\'f6r f\'f6ljande f\'f6r varje:\
+				a[k] = copy[i];				//Vi ska nu ta ett v\'e4rde fr\'e5n extraarrayen, antingen fr\'e5n position i (v\'e4nstra delen) \
+				i++;				\
+			\} else \{							\
+				a[k] = copy[j];				//eller fr\'e5n position j (h\'f6gra delen), och l\'e4gga p\'e5 position k i originalarrayen.		\
+				j++;						\
+			\}								\
+			k++;\
+		\}\
+		while(i <= mid) \{					//Om i \'e4r st\'f6rre \'e4n mid (allts\'e5 v\'e4nstra delen \'e4r slut), tar tar vi v\'e4rdet fr\'e5n position j (och r\'e4knar upp j).\
+			a[k] = copy[i];					//Om j \'e4r st\'f6rre \'e4n hi (allts\'e5 h\'f6gra delen \'e4r slut), tar tar vi v\'e4rdet fr\'e5n position i (och r\'e4knar upp i).\
+			k++;							//Annars j\'e4mf\'f6r vi v\'e4rdet p\'e5 position i med v\'e4rdet p\'e5 position j, och tar det minsta (och r\'e4knar upp antingen i eller j, det vi tog fr\'e5n).\
+			i++;\
+		\}\
+		\
+		\
+		\
+		//		if(i > mid) \{\
+		//			a[k] = copy[j++];\
+		//		\}\
+		//		else if(j > hi) \{\
+		//			a[k] = copy[i++];\
+		//		\}\
+		//		else if(copy[i] > copy[j]) \{\
+		//			a[k] = copy[j++];\
+		//		\}\
+		//		else\{\
+		//			a[k] = copy[i++];\
+		//		\}\
+	\}\
+\
+	//	Quicksort p\'e5 hel array:\
+	static void quickSort(byte[] a, int lo, int hi) \{\
+		shuffle(a,lo,hi);							//Blanda om arrayen (f\'f6r att undvika urartningsfall).\
+\
+		if(hi > lo) \{								//Om hi inte \'e4r st\'f6rre \'e4n lo har vi h\'f6gst ett element och d\'e5 \'e4r denna del av arrayen redan sorterad, s\'e5 klart!\
+			byte p = a[lo];							//Annars, v\'e4lj elementet p\'e5 position lo som pivotelement. Vi kallar det p. Vi ska partitionera s\'e5 att inga element som \'e4r st\'f6rre \'e4n p st\'e5r till v\'e4nster om n\'e5got som \'e4r st\'f6rre \'e4n p.\
+			int i = lo;								//L\'e5t i b\'f6rja p\'e5 lo och j p\'e5 hi + 1. Vi ska r\'e4kna upp i och r\'e4kna ner j tills de m\'f6ts. Upprepa:\
+			int j = hi+1;\
+			\
+			do \{ \
+				i++;								//R\'e4kna upp i, f\'f6rst en g\'e5ng, och forts\'e4tt s\'e5 l\'e4nge i \'e4r mindre \'e4n hi och elementet p\'e5 position i \'e4r mindre \'e4n p.\
+			\} while(i < hi && a[i] < p); \
+\
+			do \{\
+				j--;								//R\'e4kna ner j, f\'f6rst en g\'e5ng, och forts\'e4tt s\'e5 l\'e4nge elementet p\'e5 position j \'e4r st\'f6rre \'e4n p. (Vi beh\'f6ver faktiskt inte kolla att j inte g\'e5r f\'f6rbi lo, eftersom vi vet att elementet p\'e5 position lo \'e4r p och d\'e4rf\'f6r inte st\'f6rre \'e4n p.)\
+			\} while(a[j] > p);\
+			\
+			if(i >= j) 	\{							//Om i och j har m\'f6tts, allts\'e5 i \uc0\u8805  j, bryt loopen.\
+//				break;	\
+			\}\
+				\
+			else \{									//Annars, byt v\'e4rdena p\'e5 position i och j, och forts\'e4tt.\
+				byte temp = a[i];\
+				a[i] = a[j];\
+				a[j] = temp;\
+			\}		\
+			byte temp = a[lo];\
+			a[lo] = a[j];							//Slutf\'f6r partitioneringen genom att l\'e4gga in p p\'e5 r\'e4tt plats: byt v\'e4rdena p\'e5 position lo och j. Nu vet vi att inga v\'e4rden till v\'e4nster om j \'e4r mindre \'e4n p, och inga v\'e4rden till h\'f6ger om j \'e4r st\'f6rre \'e4n p.\
+			a[j] = temp;\
+			quickSort(a, lo, j-1); 					//K\'f6r quicksort rekursivt p\'e5 delen fr\'e5n lo till j \uc0\u8722  1.\
+			quickSort(a, j+1, hi);					//K\'f6r quicksort rekursivt p\'e5 delen fr\'e5n j + 1 till hi.\
+	\}\
+\}\
+\
+\
+\
+	    static void quicksort(byte[] a, int lo, int hi) \{\
+	    	shuffle(a,lo,hi); //Blanda om arrayen (f\'f6r att undvika urartningsfall).\
+	    	\
+	        int i = lo;\
+	        int j = hi;\
+	        byte p = a[lo];	\
+\
+	        while (i <= j) \{ //Om hi inte \'e4r st\'f6rre \'e4n lo har vi h\'f6gst ett element och d\'e5 \'e4r denna del av arrayen redan sorterad, s\'e5 klart!\
+	            while (a[i] < p) \{\
+	                i++;\
+	            \}\
+	            while (a[j] > p) \{\
+	                j--;\
+	            \}\
+	            if (i <= j) \{\
+	                exchange(a, i, j);\
+	                i++;\
+	                j--;\
+	            \}\
+	        \}\
+	        if (lo < j)\
+	            quicksort(a, lo, j);\
+	        if (i < hi)\
+	            quicksort(a, i, hi);\
+	    \}\
+\
+	    static void exchange(byte[] a, int i, int j) \{\
+	        byte temp = a[i];\
+	        a[i] = a[j];\
+	        a[j] = temp;\
+	    \}\
+	\
+\
+\
+\
+\
+	static void insertionSort(byte[] a, int lo, int hi) \{\
+		for (int i = lo; i <= hi; i++) \{\
+			for (int j = i; j > lo && a[j] < a[j-1]; j--) \{\
+				byte x = a[j]; a[j] = a[j-1]; a[j-1] = x;\
+			\}\
+		\}\
+	\}\
+\
+	// Checks if the first n element of a are in sorted order.\
+	private static boolean isSorted(byte[] a, int lo, int hi) \{\
+		int flaws = 0;\
+		for (int i = lo+1; i <= hi; i++) \{\
+			if (a[i] < a[i-1]) \{\
+				if (flaws++ >= 10) \{\
+					System.out.println("...");\
+					break;\
+				\}\
+				System.out.println("a["+i+"] = "+a[i]+", a["+(i-1)+"] = "+a[i+1]);\
+			\}\
+		\}\
+		return flaws == 0;\
+	\}\
+\
+	// Shuffles the first n elements of a.\
+	public static void shuffle(byte[] a, int lo, int hi) \{\
+		Random rand = new Random();\
+		for (int i = lo; i <= hi; i++) \{\
+			int r = i + rand.nextInt(hi+1-i);     // between i and hi\
+			byte t = a[i]; a[i] = a[r]; a[r] = t;\
+		\}\
+	\}\
+\
+	public static void main(String[] args) throws Exception \{\
+		byte[] encoded = Files.readAllBytes(Paths.get("files/bible-en.txt"));\
+		int N = encoded.length; // Change to some number to test on part of array.\
+\
+		long before = System.currentTimeMillis();\
+//				mergeSort(encoded, 0, N-1);\
+				arrayCreate(encoded,0,N-1);\
+//		quicksort(encoded,0,N-1);\
+		long after = System.currentTimeMillis();\
+\
+		// Write sorted to file, in case we want to check it.\
+		Files.write(Paths.get("files/processed.txt"), encoded);        \
+\
+		if (isSorted(encoded, 0, N-1)) \{\
+			System.out.println((after-before) / 1000.0 + " seconds");\
+\
+		\}\
+	\}\
+\}\
+}

@@ -1,0 +1,200 @@
+package com.company;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Random;
+
+public class Main {
+    private static final int LIMIT = 10; // Change the limit for when quicksort and mergesort should use insertion sort
+
+    // Checks if the first n element of a are in sorted order.
+    private static boolean isSorted(byte[] a, int lo, int hi) {
+        int flaws = 0;
+        for (int i = lo + 1; i <= hi; i++) {
+            if (a[i] < a[i - 1]) {
+                if (flaws++ >= 10) {
+                    System.out.println("...");
+                    break;
+                }
+                System.out.println("a[" + i + "] = " + a[i] + ", a[" + (i - 1) + "] = " + a[i + 1]);
+            }
+        }
+        return flaws == 0;
+    }
+
+    // Shuffles the first n elements of a.
+    private static void shuffle(byte[] a, int lo, int hi) {
+        Random rand = new Random();
+        for (int i = lo; i <= hi; i++) {
+            int r = i + rand.nextInt(hi + 1 - i);     // between i and hi
+            byte t = a[i];
+            a[i] = a[r];
+            a[r] = t;
+        }
+    }
+
+    private static void insertionSort(byte[] a, int lo, int hi) {
+        for (int i = lo; i <= hi; i++) {
+            for (int j = i; j > lo && a[j] < a[j - 1]; j--) {
+                byte x = a[j];
+                a[j] = a[j - 1];
+                a[j - 1] = x;
+            }
+        }
+    }
+
+    private static void sortQuick(byte[] a, int lo, int hi) {
+        if (hi <= lo) return;
+        int j = quickSort(a, lo, hi);
+        sortQuick(a, lo, j - 1);
+        sortQuick(a, j + 1, hi);
+    }
+
+    private static void sortQuick2(byte[] a, int lo, int hi) {
+        if (hi <= lo) return;
+        if ((hi - lo) < LIMIT) {
+            insertionSort(a, lo, hi);
+        }
+        int j = quickSort(a, lo, hi);
+        sortQuick2(a, lo, j - 1);
+        sortQuick2(a, j + 1, hi);
+    }
+
+    private static int quickSort(byte[] a, int lo, int hi) {
+        int i = lo;
+        int j = hi + 1;
+        Comparable v = a[lo];
+        Comparable w;
+        while (true) {
+            while ((w = a[++i]).compareTo(v) < 0) {
+                if (i == hi) break;
+            }
+            while (v.compareTo(a[--j]) < 0) {
+                if (j == lo) break;
+            }
+            if (i >= j) break;
+            byte b = a[i];
+            a[i] = a[j];
+            a[j] = b;
+        }
+        byte b = a[lo];
+        a[lo] = a[j];
+        a[j] = b;
+        return j;
+    }
+
+
+    private static void arrayCreate(byte[] a, int lo, int hi) {
+        byte[] copy = new byte[a.length];
+        mergeSort(a, lo, hi, copy);
+    }
+
+    private static void mergeSort(byte[] a, int lo, int hi, byte[] copy) {
+        if (lo < hi) {
+            int mid = lo + (hi - lo) / 2;
+            mergeSort(a, lo, mid, copy);
+            mergeSort(a, mid + 1, hi, copy);
+            merge(a, lo, mid, hi, copy);
+        }
+    }
+
+    private static void arrayCreate2(byte[] a, int lo, int hi) {
+        byte[] copy = new byte[a.length];
+        mergeSort2(a, lo, hi, copy);
+    }
+
+    private static void mergeSort2(byte[] a, int lo, int hi, byte[] copy) {
+        if (hi - lo <= LIMIT) {
+            insertionSort(a, lo, hi);
+        }
+        if (lo < hi) {
+            int mid = lo + (hi - lo) / 2;
+            mergeSort2(a, lo, mid, copy);
+            mergeSort2(a, mid + 1, hi, copy);
+            merge(a, lo, mid, hi, copy);
+        }
+    }
+
+    private static void merge(byte[] a, int lo, int mid, int hi, byte[] copy) {
+        for (int i = lo; i <= hi; i++) {
+            copy[i] = a[i];
+        }
+        int i = lo, j = mid + 1, k = lo;
+        while (i <= mid && j <= hi) {
+            if (copy[i] <= copy[j]) {
+                a[k] = copy[i++];
+            } else {
+                a[k] = copy[j++];
+            }
+            k++;
+        }
+        while (i <= mid) {
+            a[k] = copy[i];
+            k++;
+            i++;
+        }
+    }
+
+
+    public static void main(String[] args) throws Exception {
+        byte[] encoded = Files.readAllBytes(Paths.get("files/bible-en.txt"));
+        int n = 50; // Change to some number to test on part of array.
+        int N = encoded.length / n;
+        System.out.println("Size of text length/" + n + ": " + N);
+
+        //Insertion sort
+        shuffle(encoded, 0, encoded.length - 1);
+        long insertionStart = System.currentTimeMillis();
+        insertionSort(encoded, 0, N - 1);
+        long insertionEnd = System.currentTimeMillis();
+        if (isSorted(encoded, 0, N - 1)) {
+            System.out.println("Insertion sort: " + (insertionEnd - insertionStart) / 1000.0 + " seconds");
+        }
+
+        //Quick sort
+        shuffle(encoded, 0, encoded.length - 1);
+        long quickSortStart = System.currentTimeMillis();
+        sortQuick(encoded, 0, N - 1);
+        long quickSortEnd = System.currentTimeMillis();
+        long quickSort = quickSortEnd - quickSortStart;
+        if (isSorted(encoded, 0, N - 1)) {
+            System.out.println("QuickSort: " + (quickSortEnd - quickSortStart) / 1000.0 + " seconds");
+        }
+
+        //Quick sort using Insertion sort at a set limit and printing the difference between the two methods
+        shuffle(encoded, 0, encoded.length - 1);
+        long quickSortStart2 = System.currentTimeMillis();
+        sortQuick2(encoded, 0, N - 1);
+        long quickSortEnd2 = System.currentTimeMillis();
+        long quickSortInsertion = quickSortEnd2 - quickSortStart2;
+        if (isSorted(encoded, 0, N - 1)) {
+            System.out.println("QuickInsertionSort with LIMIT=" + LIMIT + ": " + (quickSortEnd2 - quickSortStart2) / 1000.0 + " seconds");
+            System.out.println("Difference between QuickSort and QuickInsertionSort: " + (quickSort - quickSortInsertion) / 1000.0 + " seconds faster");
+        }
+
+        //Merge sort
+        shuffle(encoded, 0, encoded.length - 1);
+        long ourMergeSortStart = System.currentTimeMillis();
+        arrayCreate(encoded, 0, N - 1);
+        long ourMergeSortEnd = System.currentTimeMillis();
+        long mergeSort = ourMergeSortEnd - ourMergeSortStart;
+        if (isSorted(encoded, 0, N - 1)) {
+            System.out.println("MergeSort: " + (ourMergeSortEnd - ourMergeSortStart) / 1000.0 + " seconds");
+        }
+
+        //Merge sort using Insertion sort at a set limit and printing the difference between the two mothods
+        shuffle(encoded, 0, encoded.length - 1);
+        long ourMergeSortStart2 = System.currentTimeMillis();
+        arrayCreate2(encoded, 0, N - 1);
+        long ourMergeSortEnd2 = System.currentTimeMillis();
+        long mergeInsertion = ourMergeSortEnd2 - ourMergeSortStart2;
+        if (isSorted(encoded, 0, N - 1)) {
+            System.out.println("MergeSort with InsertionSort LIMIT=" + LIMIT + ": " + (ourMergeSortEnd2 - ourMergeSortStart2) / 1000.0 + " seconds");
+            System.out.println("Difference between MergeSort and Merg/InsertionSort: " + (mergeSort - mergeInsertion) / 1000.0 + " seconds faster");
+        }
+
+        // Write sorted to file, in case we want to check it.
+        Files.write(Paths.get("files/processed.txt"), encoded);
+
+    }
+}
